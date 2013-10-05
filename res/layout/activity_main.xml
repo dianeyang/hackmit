@@ -11,4 +11,11 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true" />
 
+    <android.view.SurfaceView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+    </android.view.SurfaceView>
+
 </RelativeLayout>

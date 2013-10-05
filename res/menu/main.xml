@@ -5,5 +5,6 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_settings"/>
+  <item android:title="Take Picture" android:id="@+id/camera" android:icon="@drawable/ic_launcher" android:showAsAction="ifRoom"></item>
 
 </menu>

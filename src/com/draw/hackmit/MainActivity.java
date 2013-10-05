@@ -6,8 +6,10 @@ import android.content.Context;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnHoverListener;
 import android.view.WindowManager;
+import android.view.View.OnTouchListener;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.view.Menu;
@@ -46,8 +48,8 @@ import android.view.MenuItem;
  * http://commonsware.com/AdvAndroid
  */
 
-public class MainActivity extends Activity implements OnHoverListener {
-
+public class MainActivity extends Activity implements OnHoverListener, OnClickListener {
+	
 	private SurfaceView preview = null;
 	private SurfaceHolder previewHolder = null;
 	private Camera camera = null;
@@ -71,7 +73,17 @@ public class MainActivity extends Activity implements OnHoverListener {
 		previewHolder = preview.getHolder();
 		previewHolder.addCallback(surfaceCallback);
 		previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+		
+		preview.setOnClickListener(new OnClickListener() {
+		    @Override
+		    public void onClick(View v) {
+				camera.takePicture(null, null, photoCallback);
+		    }});
+
+		
 	}
+	
+	
 
 	@Override
 	public void onResume() {
@@ -143,7 +155,7 @@ public class MainActivity extends Activity implements OnHoverListener {
 		return (result);
 	}
 
-	private Camera.Size getSmallestPictureSize(Camera.Parameters parameters) {
+	private Camera.Size getBestPictureSize(Camera.Parameters parameters) {
 		Camera.Size result = null;
 
 		for (Camera.Size size : parameters.getSupportedPictureSizes()) {
@@ -153,7 +165,7 @@ public class MainActivity extends Activity implements OnHoverListener {
 				int resultArea = result.width * result.height;
 				int newArea = size.width * size.height;
 
-				if (newArea < resultArea) {
+				if (newArea > resultArea) {
 					result = size;
 				}
 			}
@@ -176,7 +188,7 @@ public class MainActivity extends Activity implements OnHoverListener {
 			if (!cameraConfigured) {
 				Camera.Parameters parameters = camera.getParameters();
 				Camera.Size size = getBestPreviewSize(width, height, parameters);
-				Camera.Size pictureSize = getSmallestPictureSize(parameters);
+				Camera.Size pictureSize = getBestPictureSize(parameters);
 
 				if (size != null && pictureSize != null) {
 					parameters.setPreviewSize(size.width, size.height);
@@ -255,7 +267,7 @@ public class MainActivity extends Activity implements OnHoverListener {
 	    protected String doInBackground(byte[]... jpeg) {
 	      File photo=
 	          new File(Environment.getExternalStorageDirectory(),
-	                   "Pictures");
+	                   "DCIM" + File.separator + "Camera");
 
 	      if (! photo.exists()){
 	          if (! photo.mkdirs()){
@@ -308,6 +320,14 @@ public class MainActivity extends Activity implements OnHoverListener {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+
+
+
+	@Override
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

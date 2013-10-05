@@ -2,9 +2,12 @@ package com.draw.hackmit;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Context;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.View;
 import android.view.View.OnHoverListener;
+import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.view.Menu;
@@ -201,7 +204,36 @@ public class MainActivity extends Activity implements OnHoverListener {
 
 		public void surfaceChanged(SurfaceHolder holder, int format, int width,
 				int height) {
+			
+			camera.stopPreview();
+		    Camera.Parameters params = camera.getParameters();
+
+		    WindowManager window = (WindowManager) getSystemService(Context.WINDOW_SERVICE); 
+		    android.view.Display display = window.getDefaultDisplay();
+		    
+			if(display.getRotation() == Surface.ROTATION_0)
+	        {
+	            params.setPreviewSize(height, width);                           
+	            camera.setDisplayOrientation(90);
+	        }
+
+	        if(display.getRotation() == Surface.ROTATION_90)
+	        {
+	            params.setPreviewSize(height, width);                           
+	        }
+
+	        if(display.getRotation() == Surface.ROTATION_180)
+	        {
+	            params.setPreviewSize(height, width);               
+	        }
+
+	        if(display.getRotation() == Surface.ROTATION_270)
+	        {
+	            params.setPreviewSize(height, width);
+	            camera.setDisplayOrientation(180);
+	        }
 			initPreview(width, height);
+
 			startPreview();
 		}
 

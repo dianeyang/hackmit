@@ -140,7 +140,7 @@ public class MainActivity extends Activity implements OnHoverListener {
 		return (result);
 	}
 
-	private Camera.Size getSmallestPictureSize(Camera.Parameters parameters) {
+	private Camera.Size getBestPictureSize(Camera.Parameters parameters) {
 		Camera.Size result = null;
 
 		for (Camera.Size size : parameters.getSupportedPictureSizes()) {
@@ -150,7 +150,7 @@ public class MainActivity extends Activity implements OnHoverListener {
 				int resultArea = result.width * result.height;
 				int newArea = size.width * size.height;
 
-				if (newArea < resultArea) {
+				if (newArea > resultArea) {
 					result = size;
 				}
 			}
@@ -173,7 +173,7 @@ public class MainActivity extends Activity implements OnHoverListener {
 			if (!cameraConfigured) {
 				Camera.Parameters parameters = camera.getParameters();
 				Camera.Size size = getBestPreviewSize(width, height, parameters);
-				Camera.Size pictureSize = getSmallestPictureSize(parameters);
+				Camera.Size pictureSize = getBestPictureSize(parameters);
 
 				if (size != null && pictureSize != null) {
 					parameters.setPreviewSize(size.width, size.height);

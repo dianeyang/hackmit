@@ -2,7 +2,7 @@
     android:id="@+id/layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp" >
+     >
 
     <TextView
         android:id="@+id/text"
@@ -12,7 +12,6 @@
         android:layout_centerVertical="true" />
 
     <android.view.SurfaceView
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >

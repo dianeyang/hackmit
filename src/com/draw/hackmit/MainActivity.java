@@ -15,6 +15,9 @@ import android.view.SurfaceView;
 import android.widget.Toast;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import android.graphics.ImageFormat;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -220,20 +223,29 @@ public class MainActivity extends Activity implements OnHoverListener {
 	    protected String doInBackground(byte[]... jpeg) {
 	      File photo=
 	          new File(Environment.getExternalStorageDirectory(),
-	                   "photo.jpg");
+	                   "Pictures");
 
-	      if (photo.exists()) {
-	        photo.delete();
+	      if (! photo.exists()){
+	          if (! photo.mkdirs()){
+	              Log.d("Camera", "failed to create directory");
+	              return null;
+	          }
 	      }
 
+	      // Create a media file name
+	      String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+	      File mediaFile;
+	      mediaFile = new File(photo.getPath() + File.separator +
+	    		  "IMG_"+ timeStamp + ".jpg");
+	           
 	      try {
-	        FileOutputStream fos=new FileOutputStream(photo.getPath());
+	        FileOutputStream fos=new FileOutputStream(mediaFile.getPath());
 
 	        fos.write(jpeg[0]);
 	        fos.close();
 	      }
 	      catch (java.io.IOException e) {
-	        Log.e("PictureDemo", "Exception in photoCallback", e);
+	        Log.e("Camera", "Exception in photoCallback", e);
 	      }
 
 	      return(null);

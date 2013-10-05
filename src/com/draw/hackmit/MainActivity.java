@@ -1,7 +1,9 @@
 package com.draw.hackmit;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Intent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -255,6 +257,7 @@ public class MainActivity extends Activity implements OnHoverListener, OnClickLi
 
 	        fos.write(jpeg[0]);
 	        fos.close();
+	        sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"+ Environment.getExternalStorageDirectory())));
 	      }
 	      catch (java.io.IOException e) {
 	        Log.e("Camera", "Exception in photoCallback", e);

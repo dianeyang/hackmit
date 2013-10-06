@@ -1,5 +1,6 @@
 package com.draw.hackmit;
 
+import android.media.ExifInterface;
 import android.media.MediaActionSound;
 import android.net.Uri;
 import android.os.Bundle;
@@ -361,9 +362,22 @@ public class MainActivity extends Activity implements OnHoverListener,
 			// Create a media file name
 			String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss")
 					.format(new Date());
-			File mediaFile;
+			
+			android.hardware.Camera.CameraInfo info =
+		            new android.hardware.Camera.CameraInfo();
+			File mediaFile= null;
+
+			try{
 			mediaFile = new File(photo.getPath() + File.separator + "IMG_"
 					+ timeStamp + ".jpg");
+			ExifInterface exif = new ExifInterface(mediaFile.getAbsolutePath());
+			exif.setAttribute(ExifInterface.TAG_ORIENTATION, "landscape");
+			exif.saveAttributes();
+			}
+			catch(Exception e){
+				Log.e("Camera", "Exception in photoCallback", e);
+
+			}
 
 			try {
 				FileOutputStream fos = new FileOutputStream(mediaFile.getPath());
@@ -374,7 +388,7 @@ public class MainActivity extends Activity implements OnHoverListener,
 						Uri.parse("file://"
 								+ Environment.getExternalStorageDirectory())));
 			} catch (java.io.IOException e) {
-				Log.e("Camera", "Exception in photoCallback", e);
+				Log.e("Camera", "Exception in videoCallback", e);
 			}
 
 			return (null);
@@ -494,18 +508,19 @@ public class MainActivity extends Activity implements OnHoverListener,
 			float velocityY) {
 		Camera.Parameters parameters = camera.getParameters();
 		Log.d("GestureRecognizer", "onFling: " + e1.toString() + e2.toString());
-		if (e2.getY() - e1.getY() > 10) { // THIS NEEDS TO BE CHANGED TO GETX ONCE WE
-										// FIX THE CAMERA ORIENTATION
+		if (Math.abs(e2.getY() - e1.getY()) > Math.abs(e1.getX() - e2.getX())) { 
+			if (e2.getY() > e1.getY()){
 			Log.d("GestureRecognizer", "This is a swipe to the left");
 			Intent intent = new Intent(this, VideoActivity.class);
 			startActivity(intent);
+			}
 		}
-		else if (e1.getX() - e2.getX() > 10) {
+		else if (e1.getX() > e2.getX()) {
 			Log.d("GestureRecognizer", "This is a swipe up");
 			Log.d("GestureRecognizer", "Turning flash on.");
 			parameters.setFocusMode(Camera.Parameters.FLASH_MODE_ON);
 		}
-		else if (e2.getX() - e1.getX() > 10) {
+		else if (e2.getX()  > e1.getX()) {
 			Log.d("GestureRecognizer", "This is a swipe down");
 			Log.d("GestureRecognizer", "Turning flash off.");
 			parameters.setFocusMode(Camera.Parameters.FLASH_MODE_OFF);			

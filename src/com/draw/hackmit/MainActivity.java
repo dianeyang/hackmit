@@ -16,6 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.view.Menu;
 import android.hardware.Camera;
+import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -32,6 +33,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.GestureDetector;
 
 /* Code partially taken from https://github.com/commonsguy/cw-advandroid/blob/master/Camera/Preview/src/com/commonsware/android/camera/PreviewDemo.java
  * License info below
@@ -50,9 +52,9 @@ import android.view.MenuItem;
  * http://commonsware.com/AdvAndroid
  */
 
-public class MainActivity extends Activity implements OnHoverListener,
-		OnClickListener {
-
+public class MainActivity extends Activity implements OnHoverListener,  GestureDetector.OnGestureListener,
+GestureDetector.OnDoubleTapListener{
+	
 	private SurfaceView preview = null;
 	private SurfaceHolder previewHolder = null;
 	private Camera camera = null;
@@ -60,6 +62,8 @@ public class MainActivity extends Activity implements OnHoverListener,
 	private boolean cameraConfigured = false;
 	// Declare the global text variable used across methods
 	private TextView text;
+    private GestureDetectorCompat mDetector; 
+
 
 	@SuppressWarnings("deprecation")
 	@Override
@@ -76,13 +80,9 @@ public class MainActivity extends Activity implements OnHoverListener,
 		previewHolder = preview.getHolder();
 		previewHolder.addCallback(surfaceCallback);
 		previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        mDetector = new GestureDetectorCompat(this,this);
 
-		preview.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				camera.takePicture(null, null, photoCallback);
-			}
-		});
+		
 
 	}
 
@@ -324,10 +324,76 @@ public class MainActivity extends Activity implements OnHoverListener,
 		return true;
 	}
 
+    public boolean onTouchEvent(MotionEvent event){ 
+        this.mDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+	
+	
 	@Override
-	public void onClick(View v) {
+	public boolean onSingleTapConfirmed(MotionEvent e) {
+		return false;
+	}
+	
+	@Override
+	public boolean onDoubleTap(MotionEvent e) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+
+	@Override
+	public boolean onDoubleTapEvent(MotionEvent e) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public boolean onDown(MotionEvent e) {
+		return true;
+	}
+
+
+
+	@Override
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+			float velocityY) {
+        Log.d("GestureRecognizer", "onFling: " + e1.toString()+e2.toString());
+        return true;
+        }
+
+
+
+	@Override
+	public void onLongPress(MotionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+			float distanceY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void onShowPress(MotionEvent e) {
 		// TODO Auto-generated method stub
 
+	}
+
+
+
+	@Override
+	public boolean onSingleTapUp(MotionEvent e) {
+        Log.d("Gesture Rec", "onSingleTapUp: " + e.toString());
+		camera.takePicture(null, null, photoCallback);
+		return true;
 	}
 
 }

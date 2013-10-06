@@ -549,17 +549,17 @@ GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
 
 
 		}
-		else if (e1.getX() > e2.getX()) {
-			Log.d("GestureRecognizer", "This is a swipe up");
-			Log.d("GestureRecognizer", "Turning flash on.");
-			parameters.setFocusMode(Camera.Parameters.FLASH_MODE_ON);
-		}
-		else if (e2.getX()  > e1.getX()) {
-			Log.d("GestureRecognizer", "This is a swipe down");
-			Log.d("GestureRecognizer", "Turning flash off.");
-			parameters.setFocusMode(Camera.Parameters.FLASH_MODE_OFF);			
-		}
-		camera.setParameters(parameters);
+//		else if (e1.getX() > e2.getX()) {
+//			Log.d("GestureRecognizer", "This is a swipe up");
+//			Log.d("GestureRecognizer", "Turning flash on.");
+//			parameters.setFocusMode(Camera.Parameters.FLASH_MODE_ON);
+//		}
+//		else if (e2.getX()  > e1.getX()) {
+//			Log.d("GestureRecognizer", "This is a swipe down");
+//			Log.d("GestureRecognizer", "Turning flash off.");
+//			parameters.setFocusMode(Camera.Parameters.FLASH_MODE_OFF);			
+//		}
+//		camera.setParameters(parameters);
 		return true;
 	}
 

@@ -14,6 +14,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnHoverListener;
 import android.view.WindowManager;
 import android.view.View.OnTouchListener;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.view.Menu;
@@ -72,7 +73,7 @@ GestureDetector.OnDoubleTapListener{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.video_activity);
 		// Initialize the layout variable and listen to hover events on it
 		RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
 		layout.setOnHoverListener(this);
@@ -123,6 +124,7 @@ GestureDetector.OnDoubleTapListener{
 			camera.stopPreview();
 		}
 
+		mediaRecorder.release();
 		camera.release();
 		camera = null;
 		inPreview = false;
@@ -258,7 +260,7 @@ GestureDetector.OnDoubleTapListener{
 		}
 
 		public void surfaceDestroyed(SurfaceHolder holder) {
-			// no-op
+			mediaRecorder.release();
 		}
 	};
 
@@ -373,6 +375,8 @@ GestureDetector.OnDoubleTapListener{
         	Log.d("GestureRecognizer", "This is a swipe to the right");
         	Intent intent = new Intent(this, MainActivity.class);
         	startActivity(intent);
+	        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+
         }
         return true;
         }
@@ -424,16 +428,18 @@ protected void startRecording() throws java.io.IOException
 
 protected void stopRecording() {
 	mediaRecorder.stop();
-	//mediaRecorder.release();
-	//camera.release();
+
 }
 
 
 	public boolean onSingleTapUp(MotionEvent e) {
 		Log.d("Recording?", ""  + recording);
 		Log.d("Gesture Rec", "onSingleTapUp: " + e.toString());
+		ImageView recIndicator = (ImageView) findViewById(R.id.grey_red_video);
+
 		if (recording) {
 			stopRecording();
+			recIndicator.setImageResource(R.drawable.grey_video);
 			Log.d("Recorder", "omg it stopped");
 			recording = !recording;
 			}
@@ -441,6 +447,7 @@ protected void stopRecording() {
 	            try {
 	                startRecording();
 					Log.d("Recorder", "omg it started");
+					recIndicator.setImageResource(R.drawable.red_video);
 					recording = !recording;
 	            } catch (Exception err) {
 	                String message = err.getMessage();

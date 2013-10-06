@@ -22,7 +22,7 @@
         <activity
             android:name="com.draw.hackmit.MainActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"
+            android:screenOrientation="landscape"
             android:configChanges="orientation|screenSize" >
             <intent-filter>
                 <action android:name="com.sec.android.airview.HOVER" />
@@ -36,7 +36,7 @@
         <activity
             android:name="com.draw.hackmit.VideoActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="landscape" >
         </activity>
     </application>
 

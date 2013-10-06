@@ -1,5 +1,6 @@
 package com.draw.hackmit;
 
+import android.media.MediaActionSound;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
@@ -15,10 +16,12 @@ import android.view.View.OnClickListener;
 import android.view.View.OnHoverListener;
 import android.view.WindowManager;
 import android.view.View.OnTouchListener;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.view.Menu;
 import android.hardware.Camera;
+import android.hardware.Camera.AutoFocusCallback;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -26,9 +29,12 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -54,9 +60,9 @@ import android.view.GestureDetector;
  * http://commonsware.com/AdvAndroid
  */
 
-public class MainActivity extends Activity implements OnHoverListener,  GestureDetector.OnGestureListener,
-GestureDetector.OnDoubleTapListener{
-	
+public class MainActivity extends Activity implements OnHoverListener,
+		GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
+
 	private SurfaceView preview = null;
 	private SurfaceHolder previewHolder = null;
 	private Camera camera = null;
@@ -64,8 +70,12 @@ GestureDetector.OnDoubleTapListener{
 	private boolean cameraConfigured = false;
 	// Declare the global text variable used across methods
 	private TextView text;
-    private GestureDetector mDetector; 
-
+	private GestureDetector mDetector;
+	// for focusing only after hovering a set amount of time
+	private int prevX = -9999;
+	private int prevY = -9999;
+	private int prevT;
+	private boolean focusing = false;
 
 	@SuppressWarnings("deprecation")
 	@Override
@@ -82,9 +92,7 @@ GestureDetector.OnDoubleTapListener{
 		previewHolder = preview.getHolder();
 		previewHolder.addCallback(surfaceCallback);
 		previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        mDetector = new GestureDetector(this,this);
-
-		
+		mDetector = new GestureDetector(this, this);
 
 	}
 
@@ -219,13 +227,15 @@ GestureDetector.OnDoubleTapListener{
 			if (!cameraConfigured) {
 				Camera.Parameters parameters = camera.getParameters();
 				Camera.Size size = getBestPreviewSize(width, height, parameters);
-				Camera.Size pictureSize = getBestPictureSize(width, height, parameters);
+				Camera.Size pictureSize = getBestPictureSize(width, height,
+						parameters);
 
 				if (size != null && pictureSize != null) {
 					parameters.setPreviewSize(size.width, size.height);
 					parameters.setPictureSize(pictureSize.width,
 							pictureSize.height);
 					parameters.setPictureFormat(ImageFormat.JPEG);
+					parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
 					camera.setParameters(parameters);
 					cameraConfigured = true;
 				}
@@ -265,6 +275,21 @@ GestureDetector.OnDoubleTapListener{
 //		camera.setParameters(parameters);
 //	}
 	
+<<<<<<< HEAD
+=======
+	 public void onOrientationChanged(int orientation) {
+		 Log.d("JFKLDS", "************** THE ORIENTATION CHANGED **************");
+	     android.hardware.Camera.CameraInfo info =
+	            new android.hardware.Camera.CameraInfo();
+	     orientation = (orientation + 45) / 90 * 90;
+	     int rotation = (info.orientation + orientation) % 360;
+	     Camera.Parameters parameters = camera.getParameters();
+		 parameters.setRotation(rotation);
+		 camera.setParameters(parameters);
+		 camera.setDisplayOrientation(rotation);
+	 }
+	
+>>>>>>> b6c627d8b1b4d9d4e8fe1d55a2d2ba2380ce34b2
 	private void startPreview() {
 		if (cameraConfigured && camera != null) {
 			camera.startPreview();
@@ -275,12 +300,15 @@ GestureDetector.OnDoubleTapListener{
 	SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
 		public void surfaceCreated(SurfaceHolder holder) {
 			// no-op -- wait until surfaceChanged()
+			camera.stopPreview();
+	        int currentCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+			setCameraDisplayOrientation(MainActivity.this, currentCameraId, camera);
 		}
 
 		public void surfaceChanged(SurfaceHolder holder, int format, int width,
 				int height) {
 			camera.stopPreview();
-			Camera.Parameters params = camera.getParameters();
+			/*Camera.Parameters params = camera.getParameters();
 
 			WindowManager window = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
 			android.view.Display display = window.getDefaultDisplay();
@@ -301,7 +329,9 @@ GestureDetector.OnDoubleTapListener{
 			if (display.getRotation() == Surface.ROTATION_270) {
 				params.setPreviewSize(height, width);
 				camera.setDisplayOrientation(180);
-			}
+			}*/
+			
+			
 			initPreview(width, height);
 
 			startPreview();
@@ -317,10 +347,15 @@ GestureDetector.OnDoubleTapListener{
 			new SavePhotoTask().execute(data);
 			camera.startPreview();
 			inPreview = true;
+			ImageView camIndicator = (ImageView) findViewById(R.id.grey_red_cam);
+			camIndicator.setImageResource(R.drawable.grey_cam);
+
 		}
 	};
 
 	class SavePhotoTask extends AsyncTask<byte[], String, String> {
+		
+
 		@Override
 		protected String doInBackground(byte[]... jpeg) {
 			File photo = new File(Environment.getExternalStorageDirectory(),
@@ -348,6 +383,7 @@ GestureDetector.OnDoubleTapListener{
 				sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED,
 						Uri.parse("file://"
 								+ Environment.getExternalStorageDirectory())));
+
 			} catch (java.io.IOException e) {
 				Log.e("Camera", "Exception in photoCallback", e);
 			}
@@ -364,6 +400,52 @@ GestureDetector.OnDoubleTapListener{
 			text.setText("ACTION_HOVER_ENTER");
 			break;
 		case MotionEvent.ACTION_HOVER_MOVE:
+			// focus camera
+			int x = getXCoord(e.getX());
+			if (x < -900) {
+				x = -900;
+			} else if (x > 900) {
+				x = 900;
+			}
+			int y = getYCoord(e.getY());
+			if (y < -900) {
+				y = -900;
+			} else if (y > 900) {
+				y = 900;
+			}
+
+			int t = (int) System.currentTimeMillis();
+			if (Math.abs(prevX - x) > 100 || Math.abs(prevY - y) > 100) {
+				prevX = x;
+				prevY = y;
+				prevT = t;
+				focusing = false;
+			}
+
+			if (t - prevT > 1000 && !focusing) {
+
+				focusing = true;
+
+				Camera.Parameters parameters = camera.getParameters();
+				List<Camera.Area> focusAreas = new ArrayList<Camera.Area>();
+
+				Rect rect = new Rect(x - 100, y - 100, x + 100, y + 100);
+				Camera.Area area = new Camera.Area(rect, 500);
+				focusAreas.add(area);
+				parameters.setFocusAreas(focusAreas);
+				camera.setParameters(parameters);
+				camera.autoFocus(new Camera.AutoFocusCallback() {
+					
+					@Override
+					public void onAutoFocus(boolean success, Camera camera) {
+						// TODO Auto-generated method stub
+						(new MediaActionSound()).play(MediaActionSound.FOCUS_COMPLETE);
+						//camera.takePicture(shutter, null, jpeg)
+					}
+				});
+				Log.d("focus", parameters.toString());
+
+			}
 			text.setText("ACTION_HOVER_MOVE");
 			break;
 		case MotionEvent.ACTION_HOVER_EXIT:
@@ -371,8 +453,17 @@ GestureDetector.OnDoubleTapListener{
 			break;
 		}
 		// Along with the event name, also print the XY location of the data
-		text.setText(text.getText() + " - X: " + e.getX() + " - Y: " + e.getY());
+		text.setText(text.getText() + " - X: " + (getXCoord(e.getX()))
+				+ " - Y: " + (getYCoord(e.getY())));
 		return true;
+	}
+
+	private int getXCoord(float hoverX) {
+		return (int) (Math.round(hoverX / 1920. * 2000. - 1000.));
+	}
+
+	private int getYCoord(float hoverY) {
+		return (int) (Math.round(hoverY / 1080. * 2000. - 1000.));
 	}
 
 	@Override
@@ -382,24 +473,21 @@ GestureDetector.OnDoubleTapListener{
 		return true;
 	}
 
-    public boolean onTouchEvent(MotionEvent event){ 
-        this.mDetector.onTouchEvent(event);
-        return super.onTouchEvent(event);
-    }
-	
-	
+	public boolean onTouchEvent(MotionEvent event) {
+		this.mDetector.onTouchEvent(event);
+		return super.onTouchEvent(event);
+	}
+
 	@Override
 	public boolean onSingleTapConfirmed(MotionEvent e) {
 		return false;
 	}
-	
+
 	@Override
 	public boolean onDoubleTap(MotionEvent e) {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
-
 
 	@Override
 	public boolean onDoubleTapEvent(MotionEvent e) {
@@ -407,35 +495,45 @@ GestureDetector.OnDoubleTapListener{
 		return false;
 	}
 
-
 	@Override
 	public boolean onDown(MotionEvent e) {
 		return true;
 	}
 
-
-
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
-        Log.d("GestureRecognizer", "onFling: " + e1.toString()+e2.toString());
-        if (e1.getY () < e2.getY()) { //THIS NEEDS TO BE CHANGED TO GETX ONCE WE FIX THE CAMERA ORIENTATION
-        	Log.d("GestureRecognizer", "This is a swipe to the left");
-        	Intent intent = new Intent(this, VideoActivity.class);
-        	startActivity(intent);
-        }
-        return true;
-        }
+		Camera.Parameters parameters = camera.getParameters();
+		Log.d("GestureRecognizer", "onFling: " + e1.toString() + e2.toString());
+		if (e2.getY() - e1.getY() > 10) { // THIS NEEDS TO BE CHANGED TO GETX ONCE WE
+										// FIX THE CAMERA ORIENTATION
+			Log.d("GestureRecognizer", "This is a swipe to the left");
+			Intent intent = new Intent(this, VideoActivity.class);
+			
+			startActivity(intent);
+	        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
 
 
+		}
+		else if (e1.getX() - e2.getX() > 10) {
+			Log.d("GestureRecognizer", "This is a swipe up");
+			Log.d("GestureRecognizer", "Turning flash on.");
+			parameters.setFocusMode(Camera.Parameters.FLASH_MODE_ON);
+		}
+		else if (e2.getX() - e1.getX() > 10) {
+			Log.d("GestureRecognizer", "This is a swipe down");
+			Log.d("GestureRecognizer", "Turning flash off.");
+			parameters.setFocusMode(Camera.Parameters.FLASH_MODE_OFF);			
+		}
+		camera.setParameters(parameters);
+		return true;
+	}
 
 	@Override
 	public void onLongPress(MotionEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
-
-
 
 	@Override
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
@@ -450,11 +548,12 @@ GestureDetector.OnDoubleTapListener{
 
 	}
 
-
-
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
-        Log.d("Gesture Rec", "onSingleTapUp: " + e.toString());
+		Log.d("Gesture Rec", "onSingleTapUp: " + e.toString());
+		ImageView camIndicator = (ImageView) findViewById(R.id.grey_red_cam);
+		camIndicator.setImageResource(R.drawable.red_cam);
+
 		camera.takePicture(null, null, photoCallback);
 		return true;
 	}

@@ -6,7 +6,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.view.Display;
 import android.view.MotionEvent;
+import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -178,30 +180,30 @@ GestureDetector.OnDoubleTapListener{
 		return (result);
 	}
 	
-	public static void setCameraDisplayOrientation(Activity activity,
-	        int cameraId, android.hardware.Camera camera) {
-	    android.hardware.Camera.CameraInfo info =
-	            new android.hardware.Camera.CameraInfo();
-	    android.hardware.Camera.getCameraInfo(cameraId, info);
-	    int rotation = activity.getWindowManager().getDefaultDisplay()
-	            .getRotation();
-	    int degrees = 0;
-	    switch (rotation) {
-	        case Surface.ROTATION_0: degrees = 0; break;
-	        case Surface.ROTATION_90: degrees = 90; break;
-	        case Surface.ROTATION_180: degrees = 180; break;
-	        case Surface.ROTATION_270: degrees = 270; break;
-	    }
-
-	    int result;
-	    if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-	        result = (info.orientation + degrees) % 360;
-	        result = (360 - result) % 360;  // compensate the mirror
-	    } else {  // back-facing
-	        result = (info.orientation - degrees + 360) % 360;
-	    }
-	    camera.setDisplayOrientation(result);
-	}
+//	public static void setCameraDisplayOrientation(Activity activity,
+//	        int cameraId, android.hardware.Camera camera) {
+//	    android.hardware.Camera.CameraInfo info =
+//	            new android.hardware.Camera.CameraInfo();
+//	    android.hardware.Camera.getCameraInfo(cameraId, info);
+//	    int rotation = activity.getWindowManager().getDefaultDisplay()
+//	            .getRotation();
+//	    int degrees = 0;
+//	    switch (rotation) {
+//	        case Surface.ROTATION_0: degrees = 0; break;
+//	        case Surface.ROTATION_90: degrees = 90; break;
+//	        case Surface.ROTATION_180: degrees = 180; break;
+//	        case Surface.ROTATION_270: degrees = 270; break;
+//	    }
+//
+//	    int result;
+//	    if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+//	        result = (info.orientation + degrees) % 360;
+//	        result = (360 - result) % 360;  // compensate the mirror
+//	    } else {  // back-facing
+//	        result = (info.orientation - degrees + 360) % 360;
+//	    }
+//	    camera.setDisplayOrientation(result);
+//	}
 
 	private void initPreview(int width, int height) {
 		if (camera != null && previewHolder.getSurface() != null) {
@@ -263,17 +265,6 @@ GestureDetector.OnDoubleTapListener{
 //		camera.setParameters(parameters);
 //	}
 	
-	 public void onOrientationChanged(int orientation) {
-		 Log.d("JFKLDS", "************** THE ORIENTATION CHANGED **************");
-	     android.hardware.Camera.CameraInfo info =
-	            new android.hardware.Camera.CameraInfo();
-	     orientation = (orientation + 45) / 90 * 90;
-	     int rotation = (info.orientation + orientation) % 360;
-	     Camera.Parameters parameters = camera.getParameters();
-		 parameters.setRotation(rotation);
-		 camera.setParameters(parameters);
-	 }
-	
 	private void startPreview() {
 		if (cameraConfigured && camera != null) {
 			camera.startPreview();
@@ -288,7 +279,6 @@ GestureDetector.OnDoubleTapListener{
 
 		public void surfaceChanged(SurfaceHolder holder, int format, int width,
 				int height) {
-
 			camera.stopPreview();
 			Camera.Parameters params = camera.getParameters();
 
@@ -468,5 +458,43 @@ GestureDetector.OnDoubleTapListener{
 		camera.takePicture(null, null, photoCallback);
 		return true;
 	}
-
+	
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		Log.d("JFKLDS", "************** THE ORIENTATION CHANGED **************");
+		Display display = ((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+		int orientation = display.getRotation();
+		int degrees = 0;
+		switch (orientation) {
+		case Surface.ROTATION_0:
+			degrees = 0;
+			break;
+		case Surface.ROTATION_90:
+			degrees = 90;
+			break;
+		case Surface.ROTATION_180:
+			degrees = 180;
+			break;
+		case Surface.ROTATION_270:
+			degrees = 270;
+			break;
+		}
+		android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
+		orientation = (orientation + 45) / 90 * 90;
+		int rotation = (info.orientation + degrees) % 360;
+		Camera.Parameters parameters = camera.getParameters();
+		parameters.setRotation(rotation);
+		camera.setParameters(parameters);
+	}
+	
+//	public void onOrientationChanged(int orientation) {
+//		Log.d("JFKLDS", "************** THE ORIENTATION CHANGED **************");
+//		android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
+//		orientation = (orientation + 45) / 90 * 90;
+//		int rotation = (info.orientation + orientation) % 360;
+//		Camera.Parameters parameters = camera.getParameters();
+//		parameters.setRotation(rotation);
+//		camera.setParameters(parameters);
+//	}
 }
+

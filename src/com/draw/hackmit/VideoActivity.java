@@ -305,7 +305,7 @@ public class VideoActivity extends Activity implements OnHoverListener,
 		// Depending on what action is performed, set the text to that action
 		switch (e.getActionMasked()) {
 		case MotionEvent.ACTION_HOVER_ENTER:
-			text.setText("ACTION_HOVER_ENTER");
+//			text.setText("ACTION_HOVER_ENTER");
 			break;
 		case MotionEvent.ACTION_HOVER_MOVE:
 			// focus camera
@@ -365,14 +365,14 @@ public class VideoActivity extends Activity implements OnHoverListener,
 					focusIm.setImageResource(0);
 				}}, 2000);
 
-			text.setText("ACTION_HOVER_MOVE");
+//			text.setText("ACTION_HOVER_MOVE");
 			break;
 		case MotionEvent.ACTION_HOVER_EXIT:
-			text.setText("ACTION_HOVER_EXIT");
+//			text.setText("ACTION_HOVER_EXIT");
 			break;
 		}
 		// Along with the event name, also print the XY location of the data
-		text.setText(text.getText() + " - X: " + e.getX() + " - Y: " + e.getY());
+//		text.setText(text.getText() + " - X: " + e.getX() + " - Y: " + e.getY());
 		return true;
 	}
 

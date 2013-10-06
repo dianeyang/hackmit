@@ -16,7 +16,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.view.Menu;
 import android.hardware.Camera;
-import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -62,7 +61,7 @@ GestureDetector.OnDoubleTapListener{
 	private boolean cameraConfigured = false;
 	// Declare the global text variable used across methods
 	private TextView text;
-    private GestureDetectorCompat mDetector; 
+    private GestureDetector mDetector; 
 
 
 	@SuppressWarnings("deprecation")
@@ -80,7 +79,7 @@ GestureDetector.OnDoubleTapListener{
 		previewHolder = preview.getHolder();
 		previewHolder.addCallback(surfaceCallback);
 		previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        mDetector = new GestureDetectorCompat(this,this);
+        mDetector = new GestureDetector(this,this);
 
 		
 
@@ -361,6 +360,11 @@ GestureDetector.OnDoubleTapListener{
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
         Log.d("GestureRecognizer", "onFling: " + e1.toString()+e2.toString());
+        if (e1.getY () < e2.getY()) { //THIS NEEDS TO BE CHANGED TO GETX ONCE WE FIX THE CAMERA ORIENTATION
+        	Log.d("GestureRecognizer", "This is a swipe to the left");
+        	Intent intent = new Intent(this, VideoActivity.class);
+        	startActivity(intent);
+        }
         return true;
         }
 

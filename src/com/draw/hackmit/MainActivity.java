@@ -446,7 +446,7 @@ public class MainActivity extends Activity implements OnHoverListener,
 				Log.d("focus", parameters.toString());
 				final ImageView focusIm = (ImageView) findViewById(R.id.focus);
 				LayoutParams focusImParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-				focusImParams.setMargins(getXPixel(x-100), getYPixel(y-100), getXPixel(x + 100), getYPixel(y + 100));
+				focusImParams.setMargins((int)Math.round(e.getX() - 200.), (int)Math.round(e.getY() - 200.), (int)Math.round(e.getX()), (int)Math.round(e.getY()));
 				focusIm.setLayoutParams(focusImParams);
 				focusIm.setImageResource(R.drawable.focus);
 				focusIm.postDelayed(new Runnable() {

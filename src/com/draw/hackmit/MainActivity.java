@@ -1,10 +1,17 @@
 package com.draw.hackmit;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Intent;
+import android.content.Context;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnHoverListener;
+import android.view.WindowManager;
+import android.view.View.OnTouchListener;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.view.Menu;
@@ -43,8 +50,8 @@ import android.view.MenuItem;
  * http://commonsware.com/AdvAndroid
  */
 
-public class MainActivity extends Activity implements OnHoverListener {
-
+public class MainActivity extends Activity implements OnHoverListener, OnClickListener {
+	
 	private SurfaceView preview = null;
 	private SurfaceHolder previewHolder = null;
 	private Camera camera = null;
@@ -68,7 +75,17 @@ public class MainActivity extends Activity implements OnHoverListener {
 		previewHolder = preview.getHolder();
 		previewHolder.addCallback(surfaceCallback);
 		previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+		
+		preview.setOnClickListener(new OnClickListener() {
+		    @Override
+		    public void onClick(View v) {
+				camera.takePicture(null, null, photoCallback);
+		    }});
+
+		
 	}
+	
+	
 
 	@Override
 	public void onResume() {
@@ -201,7 +218,36 @@ public class MainActivity extends Activity implements OnHoverListener {
 
 		public void surfaceChanged(SurfaceHolder holder, int format, int width,
 				int height) {
+			
+			camera.stopPreview();
+		    Camera.Parameters params = camera.getParameters();
+
+		    WindowManager window = (WindowManager) getSystemService(Context.WINDOW_SERVICE); 
+		    android.view.Display display = window.getDefaultDisplay();
+		    
+			if(display.getRotation() == Surface.ROTATION_0)
+	        {
+	            params.setPreviewSize(height, width);                           
+	            camera.setDisplayOrientation(90);
+	        }
+
+	        if(display.getRotation() == Surface.ROTATION_90)
+	        {
+	            params.setPreviewSize(height, width);                           
+	        }
+
+	        if(display.getRotation() == Surface.ROTATION_180)
+	        {
+	            params.setPreviewSize(height, width);               
+	        }
+
+	        if(display.getRotation() == Surface.ROTATION_270)
+	        {
+	            params.setPreviewSize(height, width);
+	            camera.setDisplayOrientation(180);
+	        }
 			initPreview(width, height);
+
 			startPreview();
 		}
 
@@ -223,7 +269,7 @@ public class MainActivity extends Activity implements OnHoverListener {
 	    protected String doInBackground(byte[]... jpeg) {
 	      File photo=
 	          new File(Environment.getExternalStorageDirectory(),
-	                   "Pictures");
+	                   "DCIM" + File.separator + "Camera");
 
 	      if (! photo.exists()){
 	          if (! photo.mkdirs()){
@@ -243,6 +289,7 @@ public class MainActivity extends Activity implements OnHoverListener {
 
 	        fos.write(jpeg[0]);
 	        fos.close();
+	        sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"+ Environment.getExternalStorageDirectory())));
 	      }
 	      catch (java.io.IOException e) {
 	        Log.e("Camera", "Exception in photoCallback", e);
@@ -276,6 +323,14 @@ public class MainActivity extends Activity implements OnHoverListener {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+
+
+
+	@Override
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

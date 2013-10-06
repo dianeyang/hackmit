@@ -279,8 +279,6 @@ public class MainActivity extends Activity implements OnHoverListener,
 //		camera.setParameters(parameters);
 //	}
 	
-<<<<<<< HEAD
-=======
 	 public void onOrientationChanged(int orientation) {
 		 Log.d("JFKLDS", "************** THE ORIENTATION CHANGED **************");
 	     android.hardware.Camera.CameraInfo info =
@@ -293,7 +291,6 @@ public class MainActivity extends Activity implements OnHoverListener,
 		 camera.setDisplayOrientation(rotation);
 	 }
 	
->>>>>>> b6c627d8b1b4d9d4e8fe1d55a2d2ba2380ce34b2
 	private void startPreview() {
 		if (cameraConfigured && camera != null) {
 			camera.startPreview();

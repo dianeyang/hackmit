@@ -35,6 +35,14 @@
             android:layout_marginLeft="10sp" 
             android:src="@drawable/grey_cam"/>
         
+          <ImageView
+            android:id="@+id/focus"
+            android:layout_width="100sp"
+            android:layout_height="100sp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+           />
+         
     </RelativeLayout>
 
 </FrameLayout>

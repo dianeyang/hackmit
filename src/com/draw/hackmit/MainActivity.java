@@ -461,7 +461,7 @@ GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
 				Log.d("focus", parameters.toString());
 				final ImageView focusIm = (ImageView) findViewById(R.id.focus);
 				LayoutParams focusImParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-				focusImParams.setMargins(x-100, y-100, 0, 0);
+				focusImParams.setMargins(getXCoord(e.getX()), getYCoord(e.getY()), 0, 0);
 				focusIm.setLayoutParams(focusImParams);
 				focusIm.setImageResource(R.drawable.focus);
 				focusIm.postDelayed(new Runnable() {

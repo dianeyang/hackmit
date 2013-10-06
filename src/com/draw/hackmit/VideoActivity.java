@@ -64,13 +64,15 @@ GestureDetector.OnDoubleTapListener{
 	// Declare the global text variable used across methods
 	private TextView text;
     private GestureDetector mDetector; 
+    private MediaRecorder mediaRecorder;
+    private boolean recording = false;
 
 
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.video_activity);
+		setContentView(R.layout.activity_main);
 		// Initialize the layout variable and listen to hover events on it
 		RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
 		layout.setOnHoverListener(this);
@@ -106,10 +108,13 @@ GestureDetector.OnDoubleTapListener{
 		if (camera == null) {
 			camera = Camera.open();
 		}
-			startPreview();
+
+		if (mediaRecorder == null) {
+			mediaRecorder = new MediaRecorder ();
+			mediaRecorder.setCamera(camera);
+		}
 		
-	
-		
+		startPreview();
 	}
 
 	@Override
@@ -125,6 +130,17 @@ GestureDetector.OnDoubleTapListener{
 		super.onPause();
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == R.id.camera) {
+			if (inPreview) {
+				camera.takePicture(null, null, photoCallback);
+				inPreview = false;
+			}
+		}
+
+		return (super.onOptionsItemSelected(item));
+	}
 
 	private Camera.Size getBestPreviewSize(int width, int height,
 			Camera.Parameters parameters) {
@@ -257,8 +273,6 @@ GestureDetector.OnDoubleTapListener{
 	class SavePhotoTask extends AsyncTask<byte[], String, String> {
 		@Override
 		protected String doInBackground(byte[]... jpeg) {
-
-			
 			File photo = new File(Environment.getExternalStorageDirectory(),
 					"DCIM" + File.separator + "Camera");
 
@@ -387,11 +401,53 @@ GestureDetector.OnDoubleTapListener{
 	}
 
 
+protected void startRecording() throws java.io.IOException 
+{
+    camera.unlock();
+    mediaRecorder.setCamera(camera);
 
-	@Override
+    mediaRecorder.setPreviewDisplay(previewHolder.getSurface());
+    mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+    mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC); 
+
+    mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_LOW));
+    mediaRecorder.setPreviewDisplay(previewHolder.getSurface());
+    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss")
+	.format(new Date());
+    mediaRecorder.setOutputFile(Environment.getExternalStorageDirectory() + File.separator
+    		+ "DCIM" + File.separator + "Camera" + File.separator + timeStamp + ".mp4");
+
+
+    mediaRecorder.prepare();
+    mediaRecorder.start();
+}
+
+protected void stopRecording() {
+	mediaRecorder.stop();
+	//mediaRecorder.release();
+	//camera.release();
+}
+
+
 	public boolean onSingleTapUp(MotionEvent e) {
-        Log.d("Gesture Rec", "onSingleTapUp: " + e.toString());
-		camera.takePicture(null, null, photoCallback);
+		Log.d("Recording?", ""  + recording);
+		Log.d("Gesture Rec", "onSingleTapUp: " + e.toString());
+		if (recording) {
+			stopRecording();
+			Log.d("Recorder", "omg it stopped");
+			recording = !recording;
+			}
+			else {
+	            try {
+	                startRecording();
+					Log.d("Recorder", "omg it started");
+					recording = !recording;
+	            } catch (Exception err) {
+	                String message = err.getMessage();
+	                Log.i(null, "Problem Start"+message);
+	                mediaRecorder.release();
+	            }
+			}
 		return true;
 	}
 

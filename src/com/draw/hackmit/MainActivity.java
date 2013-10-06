@@ -293,13 +293,15 @@ public class MainActivity extends Activity implements OnHoverListener,
 	SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
 		public void surfaceCreated(SurfaceHolder holder) {
 			// no-op -- wait until surfaceChanged()
+	        int currentCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+			setCameraDisplayOrientation(MainActivity.this, currentCameraId, camera);
 		}
 
 		public void surfaceChanged(SurfaceHolder holder, int format, int width,
 				int height) {
 
 			camera.stopPreview();
-			Camera.Parameters params = camera.getParameters();
+			/*Camera.Parameters params = camera.getParameters();
 
 			WindowManager window = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
 			android.view.Display display = window.getDefaultDisplay();
@@ -320,7 +322,9 @@ public class MainActivity extends Activity implements OnHoverListener,
 			if (display.getRotation() == Surface.ROTATION_270) {
 				params.setPreviewSize(height, width);
 				camera.setDisplayOrientation(180);
-			}
+			}*/
+			
+			
 			initPreview(width, height);
 
 			startPreview();

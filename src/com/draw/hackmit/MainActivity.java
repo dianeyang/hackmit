@@ -23,9 +23,12 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -396,7 +399,18 @@ GestureDetector.OnDoubleTapListener{
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
         Log.d("Gesture Rec", "onSingleTapUp: " + e.toString());
-		camera.takePicture(null, null, photoCallback);
+		//camera.takePicture(null, null, photoCallback);
+        float x = e.getX();
+        float y = e.getY();
+        Rect rect = new Rect(-50, -50, 50, 50);
+        Camera.Parameters params = camera.getParameters();
+        List<Camera.Area> area = new ArrayList<Camera.Area>();
+        area.add(new Camera.Area(rect, 1000));
+        params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+        params.setFocusAreas(area);
+        camera.setParameters(params);
+        
+        
 		return true;
 	}
 

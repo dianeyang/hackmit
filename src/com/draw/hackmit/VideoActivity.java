@@ -1,11 +1,12 @@
 package com.draw.hackmit;
 
+import android.media.CamcorderProfile;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
@@ -52,7 +53,7 @@ import android.view.GestureDetector;
  * http://commonsware.com/AdvAndroid
  */
 
-public class MainActivity extends Activity implements OnHoverListener,  GestureDetector.OnGestureListener,
+public class VideoActivity extends Activity implements OnHoverListener,  GestureDetector.OnGestureListener,
 GestureDetector.OnDoubleTapListener{
 	
 	private SurfaceView preview = null;
@@ -69,7 +70,7 @@ GestureDetector.OnDoubleTapListener{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.video_activity);
 		// Initialize the layout variable and listen to hover events on it
 		RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
 		layout.setOnHoverListener(this);
@@ -105,8 +106,10 @@ GestureDetector.OnDoubleTapListener{
 		if (camera == null) {
 			camera = Camera.open();
 		}
-
-		startPreview();
+			startPreview();
+		
+	
+		
 	}
 
 	@Override
@@ -122,17 +125,6 @@ GestureDetector.OnDoubleTapListener{
 		super.onPause();
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.camera) {
-			if (inPreview) {
-				camera.takePicture(null, null, photoCallback);
-				inPreview = false;
-			}
-		}
-
-		return (super.onOptionsItemSelected(item));
-	}
 
 	private Camera.Size getBestPreviewSize(int width, int height,
 			Camera.Parameters parameters) {
@@ -177,31 +169,6 @@ GestureDetector.OnDoubleTapListener{
 
 		return (result);
 	}
-	
-	public static void setCameraDisplayOrientation(Activity activity,
-	        int cameraId, android.hardware.Camera camera) {
-	    android.hardware.Camera.CameraInfo info =
-	            new android.hardware.Camera.CameraInfo();
-	    android.hardware.Camera.getCameraInfo(cameraId, info);
-	    int rotation = activity.getWindowManager().getDefaultDisplay()
-	            .getRotation();
-	    int degrees = 0;
-	    switch (rotation) {
-	        case Surface.ROTATION_0: degrees = 0; break;
-	        case Surface.ROTATION_90: degrees = 90; break;
-	        case Surface.ROTATION_180: degrees = 180; break;
-	        case Surface.ROTATION_270: degrees = 270; break;
-	    }
-
-	    int result;
-	    if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-	        result = (info.orientation + degrees) % 360;
-	        result = (360 - result) % 360;  // compensate the mirror
-	    } else {  // back-facing
-	        result = (info.orientation - degrees + 360) % 360;
-	    }
-	    camera.setDisplayOrientation(result);
-	}
 
 	private void initPreview(int width, int height) {
 		if (camera != null && previewHolder.getSurface() != null) {
@@ -210,7 +177,7 @@ GestureDetector.OnDoubleTapListener{
 			} catch (Throwable t) {
 				Log.e("PreviewDemo-surfaceCallback",
 						"Exception in setPreviewDisplay()", t);
-				Toast.makeText(MainActivity.this, t.getMessage(),
+				Toast.makeText(this, t.getMessage(),
 						Toast.LENGTH_LONG).show();
 			}
 
@@ -231,36 +198,6 @@ GestureDetector.OnDoubleTapListener{
 		}
 	}
 
-	public void onOrientationChanged() {
-		int rotation = this.getWindowManager().getDefaultDisplay()
-				.getRotation();
-		int degrees = 0;
-		switch (rotation) {
-		case Surface.ROTATION_0:
-			degrees = 0;
-			break;
-		case Surface.ROTATION_90:
-			degrees = 90;
-			break;
-		case Surface.ROTATION_180:
-			degrees = 180;
-			break;
-		case Surface.ROTATION_270:
-			degrees = 270;
-			break;
-		}
-		
-		android.hardware.Camera.CameraInfo info =
-	            new android.hardware.Camera.CameraInfo();
-
-		int result = (info.orientation - degrees + 360) % 360;
-		camera.setDisplayOrientation(result);
-
-		Camera.Parameters parameters = camera.getParameters();
-		parameters.setRotation(degrees);
-		camera.setParameters(parameters);
-	}
-	
 	private void startPreview() {
 		if (cameraConfigured && camera != null) {
 			camera.startPreview();
@@ -320,6 +257,8 @@ GestureDetector.OnDoubleTapListener{
 	class SavePhotoTask extends AsyncTask<byte[], String, String> {
 		@Override
 		protected String doInBackground(byte[]... jpeg) {
+
+			
 			File photo = new File(Environment.getExternalStorageDirectory(),
 					"DCIM" + File.separator + "Camera");
 
@@ -416,9 +355,9 @@ GestureDetector.OnDoubleTapListener{
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
         Log.d("GestureRecognizer", "onFling: " + e1.toString()+e2.toString());
-        if (e1.getY () < e2.getY()) { //THIS NEEDS TO BE CHANGED TO GETX ONCE WE FIX THE CAMERA ORIENTATION
-        	Log.d("GestureRecognizer", "This is a swipe to the left");
-        	Intent intent = new Intent(this, VideoActivity.class);
+        if (e1.getY () > e2.getY()) { //THIS NEEDS TO BE CHANGED TO GETX ONCE WE FIX THE CAMERA ORIENTATION
+        	Log.d("GestureRecognizer", "This is a swipe to the right");
+        	Intent intent = new Intent(this, MainActivity.class);
         	startActivity(intent);
         }
         return true;

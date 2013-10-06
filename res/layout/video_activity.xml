@@ -21,6 +21,28 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true" >
         </TextView>
+        
+        
+        <ImageView
+            android:id="@+id/grey_red_video"
+            android:layout_width="50sp"
+            android:layout_height="50sp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+                      android:layout_marginBottom="10sp" 
+          
+            android:layout_marginLeft="10sp" 
+            android:src="@drawable/grey_video"/>
+        
+         <ImageView
+            android:id="@+id/focus"
+            android:layout_width="100sp"
+            android:layout_height="100sp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+           />
+        
     </RelativeLayout>
 
 </FrameLayout>

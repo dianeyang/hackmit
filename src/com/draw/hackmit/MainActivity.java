@@ -281,6 +281,7 @@ public class MainActivity extends Activity implements OnHoverListener,
 	     Camera.Parameters parameters = camera.getParameters();
 		 parameters.setRotation(rotation);
 		 camera.setParameters(parameters);
+		 camera.setDisplayOrientation(rotation);
 	 }
 	
 	private void startPreview() {
@@ -293,6 +294,7 @@ public class MainActivity extends Activity implements OnHoverListener,
 	SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
 		public void surfaceCreated(SurfaceHolder holder) {
 			// no-op -- wait until surfaceChanged()
+			camera.stopPreview();
 	        int currentCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
 			setCameraDisplayOrientation(MainActivity.this, currentCameraId, camera);
 		}
@@ -490,13 +492,25 @@ public class MainActivity extends Activity implements OnHoverListener,
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
+		Camera.Parameters parameters = camera.getParameters();
 		Log.d("GestureRecognizer", "onFling: " + e1.toString() + e2.toString());
-		if (e1.getY() < e2.getY()) { // THIS NEEDS TO BE CHANGED TO GETX ONCE WE
+		if (e2.getY() - e1.getY() > 10) { // THIS NEEDS TO BE CHANGED TO GETX ONCE WE
 										// FIX THE CAMERA ORIENTATION
 			Log.d("GestureRecognizer", "This is a swipe to the left");
 			Intent intent = new Intent(this, VideoActivity.class);
 			startActivity(intent);
 		}
+		else if (e1.getX() - e2.getX() > 10) {
+			Log.d("GestureRecognizer", "This is a swipe up");
+			Log.d("GestureRecognizer", "Turning flash on.");
+			parameters.setFocusMode(Camera.Parameters.FLASH_MODE_ON);
+		}
+		else if (e2.getX() - e1.getX() > 10) {
+			Log.d("GestureRecognizer", "This is a swipe down");
+			Log.d("GestureRecognizer", "Turning flash off.");
+			parameters.setFocusMode(Camera.Parameters.FLASH_MODE_OFF);			
+		}
+		camera.setParameters(parameters);
 		return true;
 	}
 

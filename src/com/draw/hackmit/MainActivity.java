@@ -382,6 +382,7 @@ GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
 						+ timeStamp + ".jpg");
 				ExifInterface exif = new ExifInterface(mediaFile.getAbsolutePath());
 				exif.setAttribute(ExifInterface.TAG_ORIENTATION, "landscape");
+				Log.d("Camera", "Tad Orientation: " + ExifInterface.TAG_ORIENTATION);
 				exif.saveAttributes();
 			}
 			catch(Exception e){

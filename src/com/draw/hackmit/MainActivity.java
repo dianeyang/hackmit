@@ -1,5 +1,6 @@
 package com.draw.hackmit;
 
+import android.media.ExifInterface;
 import android.media.MediaActionSound;
 import android.net.Uri;
 import android.os.Bundle;
@@ -63,7 +64,7 @@ import java.lang.Runnable;
  */
 
 public class MainActivity extends Activity implements OnHoverListener,
-		GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
+GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
 
 	private SurfaceView preview = null;
 	private SurfaceHolder previewHolder = null;
@@ -189,30 +190,30 @@ public class MainActivity extends Activity implements OnHoverListener,
 
 		return (result);
 	}
-	
-	public static void setCameraDisplayOrientation(Activity activity,
-	        int cameraId, android.hardware.Camera camera) {
-	    android.hardware.Camera.CameraInfo info =
-	            new android.hardware.Camera.CameraInfo();
-	    android.hardware.Camera.getCameraInfo(cameraId, info);
-	    int rotation = activity.getWindowManager().getDefaultDisplay()
-	            .getRotation();
-	    int degrees = 0;
-	    switch (rotation) {
-	        case Surface.ROTATION_0: degrees = 0; break;
-	        case Surface.ROTATION_90: degrees = 90; break;
-	        case Surface.ROTATION_180: degrees = 180; break;
-	        case Surface.ROTATION_270: degrees = 270; break;
-	    }
 
-	    int result;
-	    if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-	        result = (info.orientation + degrees) % 360;
-	        result = (360 - result) % 360;  // compensate the mirror
-	    } else {  // back-facing
-	        result = (info.orientation - degrees + 360) % 360;
-	    }
-	    camera.setDisplayOrientation(result);
+	public static void setCameraDisplayOrientation(Activity activity,
+			int cameraId, android.hardware.Camera camera) {
+		android.hardware.Camera.CameraInfo info =
+				new android.hardware.Camera.CameraInfo();
+		android.hardware.Camera.getCameraInfo(cameraId, info);
+		int rotation = activity.getWindowManager().getDefaultDisplay()
+				.getRotation();
+		int degrees = 0;
+		switch (rotation) {
+		case Surface.ROTATION_0: degrees = 0; break;
+		case Surface.ROTATION_90: degrees = 90; break;
+		case Surface.ROTATION_180: degrees = 180; break;
+		case Surface.ROTATION_270: degrees = 270; break;
+		}
+
+		int result;
+		if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+			result = (info.orientation + degrees) % 360;
+			result = (360 - result) % 360;  // compensate the mirror
+		} else {  // back-facing
+			result = (info.orientation - degrees + 360) % 360;
+		}
+		camera.setDisplayOrientation(result);
 	}
 
 	private void initPreview(int width, int height) {
@@ -245,50 +246,50 @@ public class MainActivity extends Activity implements OnHoverListener,
 		}
 	}
 
-//	@Override
-//	public void onConfigurationChanged(Configuration newConfig) {
-//		Log.d("title", "the orientation");
-//		int rotation = this.getWindowManager().getDefaultDisplay()
-//				.getRotation();
-//		int degrees = 0;
-//		switch (rotation) {
-//		case Surface.ROTATION_0:
-//			degrees = 0;
-//			break;
-//		case Surface.ROTATION_90:
-//			degrees = 90;
-//			break;
-//		case Surface.ROTATION_180:
-//			degrees = 180;
-//			break;
-//		case Surface.ROTATION_270:
-//			degrees = 270;
-//			break;
-//		}
-//		
-//		//android.hardware.Camera.CameraInfo info =
-//	    //        new android.hardware.Camera.CameraInfo();
-//
-//		//int result = (info.orientation - degrees + 360) % 360;
-//		//camera.setDisplayOrientation(result);
-//
-//		Camera.Parameters parameters = camera.getParameters();
-//		parameters.setRotation(degrees);
-//		camera.setParameters(parameters);
-//	}
-	
-	 public void onOrientationChanged(int orientation) {
-		 Log.d("JFKLDS", "************** THE ORIENTATION CHANGED **************");
-	     android.hardware.Camera.CameraInfo info =
-	            new android.hardware.Camera.CameraInfo();
-	     orientation = (orientation + 45) / 90 * 90;
-	     int rotation = (info.orientation + orientation) % 360;
-	     Camera.Parameters parameters = camera.getParameters();
-		 parameters.setRotation(rotation);
-		 camera.setParameters(parameters);
-		 camera.setDisplayOrientation(rotation);
-	 }
-	
+	//	@Override
+	//	public void onConfigurationChanged(Configuration newConfig) {
+	//		Log.d("title", "the orientation");
+	//		int rotation = this.getWindowManager().getDefaultDisplay()
+	//				.getRotation();
+	//		int degrees = 0;
+	//		switch (rotation) {
+	//		case Surface.ROTATION_0:
+	//			degrees = 0;
+	//			break;
+	//		case Surface.ROTATION_90:
+	//			degrees = 90;
+	//			break;
+	//		case Surface.ROTATION_180:
+	//			degrees = 180;
+	//			break;
+	//		case Surface.ROTATION_270:
+	//			degrees = 270;
+	//			break;
+	//		}
+	//		
+	//		//android.hardware.Camera.CameraInfo info =
+	//	    //        new android.hardware.Camera.CameraInfo();
+	//
+	//		//int result = (info.orientation - degrees + 360) % 360;
+	//		//camera.setDisplayOrientation(result);
+	//
+	//		Camera.Parameters parameters = camera.getParameters();
+	//		parameters.setRotation(degrees);
+	//		camera.setParameters(parameters);
+	//	}
+
+	public void onOrientationChanged(int orientation) {
+		Log.d("JFKLDS", "************** THE ORIENTATION CHANGED **************");
+		android.hardware.Camera.CameraInfo info =
+				new android.hardware.Camera.CameraInfo();
+		orientation = (orientation + 45) / 90 * 90;
+		int rotation = (info.orientation + orientation) % 360;
+		Camera.Parameters parameters = camera.getParameters();
+		parameters.setRotation(rotation);
+		camera.setParameters(parameters);
+		camera.setDisplayOrientation(rotation);
+	}
+
 	private void startPreview() {
 		if (cameraConfigured && camera != null) {
 			camera.startPreview();
@@ -300,7 +301,7 @@ public class MainActivity extends Activity implements OnHoverListener,
 		public void surfaceCreated(SurfaceHolder holder) {
 			// no-op -- wait until surfaceChanged()
 			camera.stopPreview();
-	        int currentCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+			int currentCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
 			setCameraDisplayOrientation(MainActivity.this, currentCameraId, camera);
 		}
 
@@ -330,8 +331,8 @@ public class MainActivity extends Activity implements OnHoverListener,
 				params.setPreviewSize(height, width);
 				camera.setDisplayOrientation(180);
 			}*/
-			
-			
+
+
 			initPreview(width, height);
 
 			startPreview();
@@ -354,7 +355,7 @@ public class MainActivity extends Activity implements OnHoverListener,
 	};
 
 	class SavePhotoTask extends AsyncTask<byte[], String, String> {
-		
+
 
 		@Override
 		protected String doInBackground(byte[]... jpeg) {
@@ -370,10 +371,24 @@ public class MainActivity extends Activity implements OnHoverListener,
 
 			// Create a media file name
 			String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss")
-					.format(new Date());
-			File mediaFile;
-			mediaFile = new File(photo.getPath() + File.separator + "IMG_"
-					+ timeStamp + ".jpg");
+			.format(new Date());
+
+			android.hardware.Camera.CameraInfo info =
+					new android.hardware.Camera.CameraInfo();
+			File mediaFile= null;
+
+			try{
+				mediaFile = new File(photo.getPath() + File.separator + "IMG_"
+						+ timeStamp + ".jpg");
+				ExifInterface exif = new ExifInterface(mediaFile.getAbsolutePath());
+				exif.setAttribute(ExifInterface.TAG_ORIENTATION, "landscape");
+				Log.d("Camera", "Tad Orientation: " + ExifInterface.TAG_ORIENTATION);
+				exif.saveAttributes();
+			}
+			catch(Exception e){
+				Log.e("Camera", "Exception in photoCallback", e);
+
+			}
 
 			try {
 				FileOutputStream fos = new FileOutputStream(mediaFile.getPath());
@@ -385,7 +400,7 @@ public class MainActivity extends Activity implements OnHoverListener,
 								+ Environment.getExternalStorageDirectory())));
 
 			} catch (java.io.IOException e) {
-				Log.e("Camera", "Exception in photoCallback", e);
+				Log.e("Camera", "Exception in videoCallback", e);
 			}
 
 			return (null);
@@ -435,7 +450,7 @@ public class MainActivity extends Activity implements OnHoverListener,
 				parameters.setFocusAreas(focusAreas);
 				camera.setParameters(parameters);
 				camera.autoFocus(new Camera.AutoFocusCallback() {
-					
+
 					@Override
 					public void onAutoFocus(boolean success, Camera camera) {
 						// TODO Auto-generated method stub
@@ -523,22 +538,23 @@ public class MainActivity extends Activity implements OnHoverListener,
 			float velocityY) {
 		Camera.Parameters parameters = camera.getParameters();
 		Log.d("GestureRecognizer", "onFling: " + e1.toString() + e2.toString());
-		if (e2.getY() - e1.getY() > 10) { // THIS NEEDS TO BE CHANGED TO GETX ONCE WE
-										// FIX THE CAMERA ORIENTATION
-			Log.d("GestureRecognizer", "This is a swipe to the left");
-			Intent intent = new Intent(this, VideoActivity.class);
-			
-			startActivity(intent);
-	        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
+		if (Math.abs(e2.getY() - e1.getY()) > Math.abs(e1.getX() - e2.getX())) { 
+			if (e2.getY() > e1.getY()){
+				Log.d("GestureRecognizer", "This is a swipe to the left");
+				Intent intent = new Intent(this, VideoActivity.class);
+
+				startActivity(intent);
+			}
+			overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
 
 
 		}
-		else if (e1.getX() - e2.getX() > 10) {
+		else if (e1.getX() > e2.getX()) {
 			Log.d("GestureRecognizer", "This is a swipe up");
 			Log.d("GestureRecognizer", "Turning flash on.");
 			parameters.setFocusMode(Camera.Parameters.FLASH_MODE_ON);
 		}
-		else if (e2.getX() - e1.getX() > 10) {
+		else if (e2.getX()  > e1.getX()) {
 			Log.d("GestureRecognizer", "This is a swipe down");
 			Log.d("GestureRecognizer", "Turning flash off.");
 			parameters.setFocusMode(Camera.Parameters.FLASH_MODE_OFF);			

@@ -50,8 +50,9 @@ import android.view.MenuItem;
  * http://commonsware.com/AdvAndroid
  */
 
-public class MainActivity extends Activity implements OnHoverListener, OnClickListener {
-	
+public class MainActivity extends Activity implements OnHoverListener,
+		OnClickListener {
+
 	private SurfaceView preview = null;
 	private SurfaceHolder previewHolder = null;
 	private Camera camera = null;
@@ -75,17 +76,15 @@ public class MainActivity extends Activity implements OnHoverListener, OnClickLi
 		previewHolder = preview.getHolder();
 		previewHolder.addCallback(surfaceCallback);
 		previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-		
-		preview.setOnClickListener(new OnClickListener() {
-		    @Override
-		    public void onClick(View v) {
-				camera.takePicture(null, null, photoCallback);
-		    }});
 
-		
+		preview.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				camera.takePicture(null, null, photoCallback);
+			}
+		});
+
 	}
-	
-	
 
 	@Override
 	public void onResume() {
@@ -97,7 +96,7 @@ public class MainActivity extends Activity implements OnHoverListener, OnClickLi
 			for (int i = 0; i < Camera.getNumberOfCameras(); i++) {
 				Camera.getCameraInfo(i, info);
 
-				if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+				if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
 					camera = Camera.open(i);
 				}
 			}
@@ -157,18 +156,21 @@ public class MainActivity extends Activity implements OnHoverListener, OnClickLi
 		return (result);
 	}
 
-	private Camera.Size getBestPictureSize(Camera.Parameters parameters) {
+	private Camera.Size getBestPictureSize(int width, int height,
+			Camera.Parameters parameters) {
 		Camera.Size result = null;
 
 		for (Camera.Size size : parameters.getSupportedPictureSizes()) {
-			if (result == null) {
-				result = size;
-			} else {
-				int resultArea = result.width * result.height;
-				int newArea = size.width * size.height;
-
-				if (newArea > resultArea) {
+			if (size.width <= width && size.height <= height) {
+				if (result == null) {
 					result = size;
+				} else {
+					int resultArea = result.width * result.height;
+					int newArea = size.width * size.height;
+
+					if (newArea > resultArea) {
+						result = size;
+					}
 				}
 			}
 		}
@@ -190,7 +192,7 @@ public class MainActivity extends Activity implements OnHoverListener, OnClickLi
 			if (!cameraConfigured) {
 				Camera.Parameters parameters = camera.getParameters();
 				Camera.Size size = getBestPreviewSize(width, height, parameters);
-				Camera.Size pictureSize = getBestPictureSize(parameters);
+				Camera.Size pictureSize = getBestPictureSize(width, height, parameters);
 
 				if (size != null && pictureSize != null) {
 					parameters.setPreviewSize(size.width, size.height);
@@ -218,34 +220,30 @@ public class MainActivity extends Activity implements OnHoverListener, OnClickLi
 
 		public void surfaceChanged(SurfaceHolder holder, int format, int width,
 				int height) {
-			
+
 			camera.stopPreview();
-		    Camera.Parameters params = camera.getParameters();
+			Camera.Parameters params = camera.getParameters();
 
-		    WindowManager window = (WindowManager) getSystemService(Context.WINDOW_SERVICE); 
-		    android.view.Display display = window.getDefaultDisplay();
-		    
-			if(display.getRotation() == Surface.ROTATION_0)
-	        {
-	            params.setPreviewSize(height, width);                           
-	            camera.setDisplayOrientation(90);
-	        }
+			WindowManager window = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+			android.view.Display display = window.getDefaultDisplay();
 
-	        if(display.getRotation() == Surface.ROTATION_90)
-	        {
-	            params.setPreviewSize(height, width);                           
-	        }
+			if (display.getRotation() == Surface.ROTATION_0) {
+				params.setPreviewSize(height, width);
+				camera.setDisplayOrientation(90);
+			}
 
-	        if(display.getRotation() == Surface.ROTATION_180)
-	        {
-	            params.setPreviewSize(height, width);               
-	        }
+			if (display.getRotation() == Surface.ROTATION_90) {
+				params.setPreviewSize(height, width);
+			}
 
-	        if(display.getRotation() == Surface.ROTATION_270)
-	        {
-	            params.setPreviewSize(height, width);
-	            camera.setDisplayOrientation(180);
-	        }
+			if (display.getRotation() == Surface.ROTATION_180) {
+				params.setPreviewSize(height, width);
+			}
+
+			if (display.getRotation() == Surface.ROTATION_270) {
+				params.setPreviewSize(height, width);
+				camera.setDisplayOrientation(180);
+			}
 			initPreview(width, height);
 
 			startPreview();
@@ -255,49 +253,50 @@ public class MainActivity extends Activity implements OnHoverListener, OnClickLi
 			// no-op
 		}
 	};
-	
-	Camera.PictureCallback photoCallback=new Camera.PictureCallback() {
-	    public void onPictureTaken(byte[] data, Camera camera) {
-	      new SavePhotoTask().execute(data);
-	      camera.startPreview();
-	      inPreview=true;
-	    }
-	  };
 
-	  class SavePhotoTask extends AsyncTask<byte[], String, String> {
-	    @Override
-	    protected String doInBackground(byte[]... jpeg) {
-	      File photo=
-	          new File(Environment.getExternalStorageDirectory(),
-	                   "DCIM" + File.separator + "Camera");
+	Camera.PictureCallback photoCallback = new Camera.PictureCallback() {
+		public void onPictureTaken(byte[] data, Camera camera) {
+			new SavePhotoTask().execute(data);
+			camera.startPreview();
+			inPreview = true;
+		}
+	};
 
-	      if (! photo.exists()){
-	          if (! photo.mkdirs()){
-	              Log.d("Camera", "failed to create directory");
-	              return null;
-	          }
-	      }
+	class SavePhotoTask extends AsyncTask<byte[], String, String> {
+		@Override
+		protected String doInBackground(byte[]... jpeg) {
+			File photo = new File(Environment.getExternalStorageDirectory(),
+					"DCIM" + File.separator + "Camera");
 
-	      // Create a media file name
-	      String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-	      File mediaFile;
-	      mediaFile = new File(photo.getPath() + File.separator +
-	    		  "IMG_"+ timeStamp + ".jpg");
-	           
-	      try {
-	        FileOutputStream fos=new FileOutputStream(mediaFile.getPath());
+			if (!photo.exists()) {
+				if (!photo.mkdirs()) {
+					Log.d("Camera", "failed to create directory");
+					return null;
+				}
+			}
 
-	        fos.write(jpeg[0]);
-	        fos.close();
-	        sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"+ Environment.getExternalStorageDirectory())));
-	      }
-	      catch (java.io.IOException e) {
-	        Log.e("Camera", "Exception in photoCallback", e);
-	      }
+			// Create a media file name
+			String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss")
+					.format(new Date());
+			File mediaFile;
+			mediaFile = new File(photo.getPath() + File.separator + "IMG_"
+					+ timeStamp + ".jpg");
 
-	      return(null);
-	    }
-	  }
+			try {
+				FileOutputStream fos = new FileOutputStream(mediaFile.getPath());
+
+				fos.write(jpeg[0]);
+				fos.close();
+				sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED,
+						Uri.parse("file://"
+								+ Environment.getExternalStorageDirectory())));
+			} catch (java.io.IOException e) {
+				Log.e("Camera", "Exception in photoCallback", e);
+			}
+
+			return (null);
+		}
+	}
 
 	// For whenever a hover event is triggered on an element being listened to
 	public boolean onHover(View v, MotionEvent e) {
@@ -325,12 +324,10 @@ public class MainActivity extends Activity implements OnHoverListener, OnClickLi
 		return true;
 	}
 
-
-
 	@Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

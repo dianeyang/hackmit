@@ -14,6 +14,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnHoverListener;
 import android.view.WindowManager;
 import android.view.View.OnTouchListener;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.view.Menu;
@@ -342,10 +343,15 @@ public class MainActivity extends Activity implements OnHoverListener,
 			new SavePhotoTask().execute(data);
 			camera.startPreview();
 			inPreview = true;
+			ImageView camIndicator = (ImageView) findViewById(R.id.grey_red_cam);
+			camIndicator.setImageResource(R.drawable.grey_cam);
+
 		}
 	};
 
 	class SavePhotoTask extends AsyncTask<byte[], String, String> {
+		
+
 		@Override
 		protected String doInBackground(byte[]... jpeg) {
 			File photo = new File(Environment.getExternalStorageDirectory(),
@@ -373,6 +379,7 @@ public class MainActivity extends Activity implements OnHoverListener,
 				sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED,
 						Uri.parse("file://"
 								+ Environment.getExternalStorageDirectory())));
+
 			} catch (java.io.IOException e) {
 				Log.e("Camera", "Exception in photoCallback", e);
 			}
@@ -498,7 +505,11 @@ public class MainActivity extends Activity implements OnHoverListener,
 										// FIX THE CAMERA ORIENTATION
 			Log.d("GestureRecognizer", "This is a swipe to the left");
 			Intent intent = new Intent(this, VideoActivity.class);
+			
 			startActivity(intent);
+	        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
+
+
 		}
 		else if (e1.getX() - e2.getX() > 10) {
 			Log.d("GestureRecognizer", "This is a swipe up");
@@ -536,6 +547,9 @@ public class MainActivity extends Activity implements OnHoverListener,
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
 		Log.d("Gesture Rec", "onSingleTapUp: " + e.toString());
+		ImageView camIndicator = (ImageView) findViewById(R.id.grey_red_cam);
+		camIndicator.setImageResource(R.drawable.red_cam);
+
 		camera.takePicture(null, null, photoCallback);
 		return true;
 	}

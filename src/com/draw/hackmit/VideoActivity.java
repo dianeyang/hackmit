@@ -15,6 +15,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnHoverListener;
 import android.view.WindowManager;
 import android.view.View.OnTouchListener;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.view.Menu;
@@ -62,7 +63,7 @@ public class VideoActivity extends Activity implements OnHoverListener,
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.video_activity);
 		// Initialize the layout variable and listen to hover events on it
 		RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
 		layout.setOnHoverListener(this);
@@ -111,6 +112,7 @@ public class VideoActivity extends Activity implements OnHoverListener,
 			camera.stopPreview();
 		}
 
+		mediaRecorder.release();
 		camera.release();
 		camera = null;
 		inPreview = false;
@@ -248,7 +250,7 @@ public class VideoActivity extends Activity implements OnHoverListener,
 		}
 
 		public void surfaceDestroyed(SurfaceHolder holder) {
-			// no-op
+			mediaRecorder.release();
 		}
 	};
 
@@ -406,15 +408,18 @@ public class VideoActivity extends Activity implements OnHoverListener,
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
+
 		Log.d("GestureRecognizer", "onFling: " + e1.toString() + e2.toString());
 		if (e1.getY() > e2.getY()) { // THIS NEEDS TO BE CHANGED TO GETX ONCE WE
 										// FIX THE CAMERA ORIENTATION
 			Log.d("GestureRecognizer", "This is a swipe to the right");
 			Intent intent = new Intent(this, MainActivity.class);
 			startActivity(intent);
-		}
-		return true;
-	}
+	        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+
+        }
+        return true;
+        }
 
 	@Override
 	public void onLongPress(MotionEvent e) {
@@ -468,21 +473,26 @@ public class VideoActivity extends Activity implements OnHoverListener,
 	public boolean onSingleTapUp(MotionEvent e) {
 		Log.d("Recording?", "" + recording);
 		Log.d("Gesture Rec", "onSingleTapUp: " + e.toString());
+		ImageView recIndicator = (ImageView) findViewById(R.id.grey_red_video);
+
 		if (recording) {
 			stopRecording();
+			recIndicator.setImageResource(R.drawable.grey_video);
 			Log.d("Recorder", "omg it stopped");
 			recording = !recording;
-		} else {
-			try {
-				startRecording();
-				Log.d("Recorder", "omg it started");
-				recording = !recording;
-			} catch (Exception err) {
-				String message = err.getMessage();
-				Log.i(null, "Problem Start" + message);
-				mediaRecorder.release();
+		} 
+			else {
+	            try {
+	                startRecording();
+					Log.d("Recorder", "omg it started");
+					recIndicator.setImageResource(R.drawable.red_video);
+					recording = !recording;
+	            } catch (Exception err) {
+	                String message = err.getMessage();
+	                Log.i(null, "Problem Start"+message);
+	                mediaRecorder.release();
+	            }
 			}
-		}
 		return true;
 	}
 

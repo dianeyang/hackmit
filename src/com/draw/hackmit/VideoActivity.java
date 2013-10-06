@@ -24,6 +24,8 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Toast;
+import android.widget.RelativeLayout.LayoutParams;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
@@ -351,6 +353,17 @@ public class VideoActivity extends Activity implements OnHoverListener,
 					}
 				});
 			}
+			
+			final ImageView focusIm = (ImageView) findViewById(R.id.focus);
+			LayoutParams focusImParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			focusImParams.setMargins(getXPixel(x-100), getYPixel(y-100), getXPixel(x + 100), getYPixel(y + 100));
+			focusIm.setLayoutParams(focusImParams);
+			focusIm.setImageResource(R.drawable.focus);
+			focusIm.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					focusIm.setImageResource(0);
+				}}, 2000);
 
 			text.setText("ACTION_HOVER_MOVE");
 			break;
@@ -366,9 +379,17 @@ public class VideoActivity extends Activity implements OnHoverListener,
 	private int getXCoord(float hoverX) {
 		return (int) (Math.round(hoverX / 1920. * 2000. - 1000.));
 	}
+	
+	private int getXPixel(int cameraX) {
+		return (int) ((((float)cameraX) + 1000.) / 2000. * 1920.);
+	}
 
 	private int getYCoord(float hoverY) {
 		return (int) (Math.round(hoverY / 1080. * 2000. - 1000.));
+	}
+	
+	private int getYPixel(int cameraY) {
+		return (int) ((((float)cameraY) + 1000.) / 2000. * 1080.);
 	}
 
 	@Override

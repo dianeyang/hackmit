@@ -231,35 +231,48 @@ GestureDetector.OnDoubleTapListener{
 		}
 	}
 
-	public void onOrientationChanged() {
-		int rotation = this.getWindowManager().getDefaultDisplay()
-				.getRotation();
-		int degrees = 0;
-		switch (rotation) {
-		case Surface.ROTATION_0:
-			degrees = 0;
-			break;
-		case Surface.ROTATION_90:
-			degrees = 90;
-			break;
-		case Surface.ROTATION_180:
-			degrees = 180;
-			break;
-		case Surface.ROTATION_270:
-			degrees = 270;
-			break;
-		}
-		
-		android.hardware.Camera.CameraInfo info =
+//	@Override
+//	public void onConfigurationChanged(Configuration newConfig) {
+//		Log.d("title", "the orientation");
+//		int rotation = this.getWindowManager().getDefaultDisplay()
+//				.getRotation();
+//		int degrees = 0;
+//		switch (rotation) {
+//		case Surface.ROTATION_0:
+//			degrees = 0;
+//			break;
+//		case Surface.ROTATION_90:
+//			degrees = 90;
+//			break;
+//		case Surface.ROTATION_180:
+//			degrees = 180;
+//			break;
+//		case Surface.ROTATION_270:
+//			degrees = 270;
+//			break;
+//		}
+//		
+//		//android.hardware.Camera.CameraInfo info =
+//	    //        new android.hardware.Camera.CameraInfo();
+//
+//		//int result = (info.orientation - degrees + 360) % 360;
+//		//camera.setDisplayOrientation(result);
+//
+//		Camera.Parameters parameters = camera.getParameters();
+//		parameters.setRotation(degrees);
+//		camera.setParameters(parameters);
+//	}
+	
+	 public void onOrientationChanged(int orientation) {
+		 Log.d("JFKLDS", "************** THE ORIENTATION CHANGED **************");
+	     android.hardware.Camera.CameraInfo info =
 	            new android.hardware.Camera.CameraInfo();
-
-		int result = (info.orientation - degrees + 360) % 360;
-		camera.setDisplayOrientation(result);
-
-		Camera.Parameters parameters = camera.getParameters();
-		parameters.setRotation(degrees);
-		camera.setParameters(parameters);
-	}
+	     orientation = (orientation + 45) / 90 * 90;
+	     int rotation = (info.orientation + orientation) % 360;
+	     Camera.Parameters parameters = camera.getParameters();
+		 parameters.setRotation(rotation);
+		 camera.setParameters(parameters);
+	 }
 	
 	private void startPreview() {
 		if (cameraConfigured && camera != null) {

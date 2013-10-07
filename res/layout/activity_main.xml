@@ -37,8 +37,8 @@
         
           <ImageView
             android:id="@+id/focus"
-            android:layout_width="100sp"
-            android:layout_height="100sp"
+            android:layout_width="200sp"
+            android:layout_height="200sp"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
            />

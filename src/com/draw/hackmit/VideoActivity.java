@@ -24,6 +24,8 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Toast;
+import android.widget.RelativeLayout.LayoutParams;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
@@ -303,7 +305,7 @@ public class VideoActivity extends Activity implements OnHoverListener,
 		// Depending on what action is performed, set the text to that action
 		switch (e.getActionMasked()) {
 		case MotionEvent.ACTION_HOVER_ENTER:
-			text.setText("ACTION_HOVER_ENTER");
+//			text.setText("ACTION_HOVER_ENTER");
 			break;
 		case MotionEvent.ACTION_HOVER_MOVE:
 			// focus camera
@@ -351,24 +353,43 @@ public class VideoActivity extends Activity implements OnHoverListener,
 					}
 				});
 			}
+			
+			final ImageView focusIm = (ImageView) findViewById(R.id.focus);
+			LayoutParams focusImParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			focusImParams.setMargins((int)Math.round(e.getX() - 200.), (int)Math.round(e.getY() - 200.), (int)Math.round(e.getX()), (int)Math.round(e.getY()));
+			focusIm.setLayoutParams(focusImParams);
+			focusIm.setImageResource(R.drawable.focus);
+			focusIm.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					focusIm.setImageResource(0);
+				}}, 2000);
 
-			text.setText("ACTION_HOVER_MOVE");
+//			text.setText("ACTION_HOVER_MOVE");
 			break;
 		case MotionEvent.ACTION_HOVER_EXIT:
-			text.setText("ACTION_HOVER_EXIT");
+//			text.setText("ACTION_HOVER_EXIT");
 			break;
 		}
 		// Along with the event name, also print the XY location of the data
-		text.setText(text.getText() + " - X: " + e.getX() + " - Y: " + e.getY());
+//		text.setText(text.getText() + " - X: " + e.getX() + " - Y: " + e.getY());
 		return true;
 	}
 
 	private int getXCoord(float hoverX) {
 		return (int) (Math.round(hoverX / 1920. * 2000. - 1000.));
 	}
+	
+	private int getXPixel(int cameraX) {
+		return (int) ((((float)cameraX) + 1000.) / 2000. * 1920.);
+	}
 
 	private int getYCoord(float hoverY) {
 		return (int) (Math.round(hoverY / 1080. * 2000. - 1000.));
+	}
+	
+	private int getYPixel(int cameraY) {
+		return (int) ((((float)cameraY) + 1000.) / 2000. * 1080.);
 	}
 
 	@Override
